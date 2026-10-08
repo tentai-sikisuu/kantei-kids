@@ -819,7 +819,8 @@ function calcPlanetsAstroEngine(year,month,day,hour,minute,lat,lon,tzOffset){
 
   // AstronomyライブラリのGeoVector/EclipticLongitude
   const Astronomy=window.Astronomy;
-  const date=new Date(Date.UTC(year,month-1,day,Math.floor(utcHour),Math.round((utcHour%1)*60)));
+  // 現地時刻→世界時（時差ぶんをミリ秒で引く。0〜8時台の「分」で1時間ずれる不具合を修正）
+  const date=new Date(Date.UTC(year,month-1,day,hour,minute)-tzOffset*3600000);
 
   const planets={};
   const bodyMap={Sun:'Sun',Moon:'Moon',Mercury:'Mercury',Venus:'Venus',Mars:'Mars',Jupiter:'Jupiter',Saturn:'Saturn'};
@@ -1935,7 +1936,7 @@ geocode=function(place){
 
 <script>
 // ===== バージョン管理（ツールを改定したら TOOL_VERSION を上げる） =====
-var TOOL_VERSION = '2026.10.9.3';
+var TOOL_VERSION = '2026.10.9.4';
 var TOOL_SOURCE_URL = '';/*@@SRC@@*/   // ← パソコンに保存した時に、元のURLが自動で書き込まれる
 var TOOL_FILE_NAME = '鑑定書ツール_こども鑑定.html';
 (function(){
