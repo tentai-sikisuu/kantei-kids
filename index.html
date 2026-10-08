@@ -637,9 +637,10 @@ return new kd(this.curr.time,a,b)};$jscomp.global.Object.defineProperties(H.prot
     </div>
 
     <div id="error-msg" class="error-msg"></div>
+    <div class="dl-box" id="dl-box"><button class="dl-btn" id="dl-btn" type="button" onclick="downloadTool()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>&nbsp;パソコンに保存（オフライン用）</button><div class="dl-note"><span id="dl-desc">ネット環境がない場所で使うときは、保存したファイルを開いてください<br></span><span class="dl-ver" id="dl-ver"></span></div></div>
   </div>
 
-<div class="dl-box" id="dl-box"><button class="dl-btn" id="dl-btn" type="button" onclick="downloadTool()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>&nbsp;パソコンに保存（オフライン用）</button><div class="dl-note"><span id="dl-desc">ネット環境がない場所で使うときは、保存したファイルを開いてください<br></span><span class="dl-ver" id="dl-ver"></span></div></div>
+
 
   <div class="loading" id="loading">お子さまの星を読み解いています…</div>
 
@@ -1747,6 +1748,16 @@ function stardustLayer(ringRatio){
     + '" style="position:absolute;left:-60%;top:-60%;width:220%;height:220%;max-width:none;z-index:-1;pointer-events:none;">';
 }
 
+// 星屑の画像の読み込みが終わってから印刷する（終わる前に印刷すると星屑が出ない）
+function printWhenReady(box){
+  var img = box.querySelector('img.stardust'), done = false;
+  var go = function(){ if(done) return; done = true; setTimeout(function(){ window.print(); }, 80); };
+  if(!img){ go(); return; }
+  if(img.decode){ img.decode().then(go, go); }
+  else if(img.complete){ go(); }
+  else { img.onload = go; img.onerror = go; }
+  setTimeout(go, 2000);
+}
 function whitenChartSvg(html){
   var box = document.createElement('div'); box.innerHTML = html;
   var svg = box.querySelector('svg'); if(!svg) return html;
@@ -1775,7 +1786,7 @@ function downloadPDF(theme){
   var card = chart.closest('.card');
   if(theme==='white'){ chart.innerHTML = '<div style="position:relative;display:inline-block;vertical-align:top;line-height:0;">' + stardustLayer(231/500) + whitenChartSvg(chart._navy) + '</div>'; root.classList.add('print-white'); if(card) card.classList.add('stardust-card'); }
   else { chart.innerHTML = chart._navy; root.classList.remove('print-white'); if(card) card.classList.remove('stardust-card'); }
-  window.print();
+  printWhenReady(chart);
 }
 window.addEventListener('afterprint', function(){
   var chart = document.getElementById('celestial-chart');
